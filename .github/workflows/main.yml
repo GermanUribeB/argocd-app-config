@@ -42,11 +42,10 @@ jobs:
         env:
           LEVEL: ${{ inputs.logLevel }}
           TAGS: ${{ inputs.tags }}
-          
-      - name: Running Healthchecks
-        run: |
-          echo "Validating Solarsystem healthcheck"
-          if ! curl -sf http://192.168.68.115:30344; then
-            echo "Application endpoint is unavailable!" && exit 1
-          fi
 
+      - name: Application Endpoint Check
+        run: |
+          if ! curl -sf http://192.168.68.115:30344; then
+            echo "Application endpoint is unavailable!"
+            exit 1
+          fi
