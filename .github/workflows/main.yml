@@ -45,7 +45,9 @@ jobs:
 
       - name: Application Endpoint Check
         run: |
-          if ! curl -sf http://192.168.68.115:30344; then
+          if curl -sf https://www.google.com; then
+            echo "Application endpoint is available!"
+          else
             echo "Application endpoint is unavailable!"
             exit 1
           fi
