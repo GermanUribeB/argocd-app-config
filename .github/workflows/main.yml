@@ -24,6 +24,10 @@ on:
         description: 'Test scenario tags'
         required: false
         type: boolean
+      store_number:
+        description: 'Store number, e.g. lb9970'
+        required: true
+        type: string 
 
 jobs:
   package-deploy:
