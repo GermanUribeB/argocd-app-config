@@ -41,10 +41,10 @@ jobs:
 
       - name: Log the inputs
         run:  |
-          echo "Tags: $TARGET"
+          echo "Target cluster: $TARGET"
           echo "Log level: $LEVEL"
           echo "Tags: $TAGS"
-          echo "Tags: $STORE"
+          echo "Store Number: $STORE"
         env:
           TARGET: ${{ inputs.target_cluster }}
           LEVEL: ${{ inputs.logLevel }}
