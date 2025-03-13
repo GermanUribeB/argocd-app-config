@@ -41,11 +41,15 @@ jobs:
 
       - name: Log the inputs
         run:  |
+          echo "Tags: $TARGET"
           echo "Log level: $LEVEL"
           echo "Tags: $TAGS"
+          echo "Tags: $STORE"
         env:
+          TARGET: ${{ inputs.target_cluster }}
           LEVEL: ${{ inputs.logLevel }}
           TAGS: ${{ inputs.tags }}
+          STORE: ${{ inputs.store_number }}
 
       - name: Application Endpoint Check
         run: |
