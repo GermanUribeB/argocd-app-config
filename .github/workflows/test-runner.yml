@@ -1,0 +1,22 @@
+name: Test Self-Hosted Runner
+
+on:
+  workflow_dispatch:  # Allows manual triggering
+
+jobs:
+  test-install:
+    runs-on: [self-hosted]  # Matches your custom labels
+    steps:
+      - name: Check Runner OS
+        run: |
+          echo "Running on $(uname -a)"
+          # Simulate Windows-like commands (PowerShell Core works on macOS)
+          pwsh -Command "Write-Host 'Pretending to be Windows...'"
+      
+      - name: Fake XStore Installation
+        run: |
+          echo "Simulating XStore install via msiexec..."
+          # Since you can't run real Windows installers, simulate it
+          mkdir -p /tmp/xstore
+          echo "XStore Installed" > /tmp/xstore/install.log
+          cat /tmp/xstore/install.log
