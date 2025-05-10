@@ -11,7 +11,7 @@ jobs:
         uses: actions/checkout@v4
         
       - name: Check if XStore exists
-        shell: pwsh
+        shell: powershell
         run: |
           $installPath = "C:\Program Files\XStore\XStore.exe"
           if (Test-Path $installPath) {
