@@ -13,7 +13,7 @@ jobs:
       - name: Check if XStore exists
         shell: powershell
         run: |
-          $installPath = "C:\Program Files\XStore\XStore.exe"
+          $installPath = "C:\Program Files (x86)\Sherwin-Williams-POS\Sherwin-Williams-POS.exe"
           if (Test-Path $installPath) {
             Write-Output "XStore already installed at $installPath"
           } else {
