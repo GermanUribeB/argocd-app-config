@@ -10,19 +10,42 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         
-      - name: Check if XStore exists
+      - name: Check if XStore is already installed
+        id: check-installation
         shell: powershell
         run: |
           $installPath = "C:\Program Files (x86)\Sherwin-Williams-POS\Sherwin-Williams-POS.exe"
           if (Test-Path $installPath) {
             Write-Output "XStore already installed at $installPath"
+            Write-Output "::set-output name=installed::true"
           } else {
             Write-Output "XStore not installed! Running installation script"
-            try {
-              .\scripts\install-xstore.ps1 -ErrorAction Stop
-              Write-Output "Installation completed successfully"
-            } catch {
-              Write-Error "Installation failed: $_"
-              exit 1
-            }
+            Write-Output "::set-output name=installed::false"
+            dir "C:\"
+            dir "C:\Program Files (x86)"
+            dir "C:\Program Files"
           }
+      - name: Downloading xstore file
+        if: steps.check-installation.outputs.installed == 'false'
+        shell: powershell
+        run: |
+          $installPath = "https://artifactory.sherwin.com/artifactory/sherwin-release-local/tag/pos/client/pos-setup-23.120.exe"
+          $installerPath = "$env:RUNNER_TEMP\pos-setup-23.120.exe"
+          Invoke-WebRequest -Uri $installerUrl -OutFile $installerPath
+          Write-Output "Downloaded installer to $installerPath"
+
+      - name: Install XStore
+        if: steps.check-installation.outputs.installed == 'false'
+        shell: powershell
+        run: |
+          $installerPath = "$env:RUNNER_TEMP\pos-setup-23.120.exe"
+          $installLog = "$env:RUNNER_TEMP\pos-install.log"
+
+          Start-Process -FilePath $installerPath -ArgumentList "/Silent" -Wait
+        
+          $installPath = "C:\Program Files (x86)\Sherwin-Williams-POS\Sherwin-Williams-POS.exe"
+          if (Test-Path $installPath) {
+            Write-Output "::notice::XStore installed successfully"
+          } else {
+            Write-Output "::error::Installation failed"
+            exit 1
