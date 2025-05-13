@@ -29,16 +29,16 @@ jobs:
         if: steps.check-installation.outputs.installed == 'false'
         shell: powershell
         run: |
-          $installerUrl = "https://artifactory.sherwin.com/artifactory/sherwin-release-local/tag/pos/client/pos-setup-23.120.exe"
-          $installerPath = "$env:RUNNER_TEMP\pos-setup-23.120.exe"
-          Invoke-WebRequest -Uri $installerUrl -OutFile $installerPath
+          # $installerUrl = "https://artifactory.sherwin.com/artifactory/sherwin-release-local/tag/pos/client/pos-setup-23.120.exe"
+          $installerPath = "C:\pos-setup-23.120.exe"
+          # Invoke-WebRequest -Uri $installerUrl -OutFile $installerPath
           Write-Output "Downloaded installer to $installerPath"
 
       - name: Install XStore
         if: steps.check-installation.outputs.installed == 'false'
         shell: powershell
         run: |
-          $installerPath = "$env:RUNNER_TEMP\pos-setup-23.120.exe"
+          $installerPath = "C:\pos-setup-23.120.exe"
           $installLog = "$env:RUNNER_TEMP\pos-install.log"
 
           Start-Process -FilePath $installerPath -ArgumentList "/Silent" -Wait
