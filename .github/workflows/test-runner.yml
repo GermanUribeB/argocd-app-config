@@ -34,6 +34,19 @@ jobs:
           # Invoke-WebRequest -Uri $installerUrl -OutFile $installerPath
           Write-Output "Downloaded installer to $installerPath"
 
+      - name: Install Drivers
+        if: steps.check-installation.outputs.installed == 'false'
+        shell: powershell
+        run: |
+          $zebra_installer = "C:\Zebra_CoreScanner_Driver_64bit_v3.06.0022"
+          $epson_installer = "C:\EPSON_JavaPOS_1.14.28"
+          $lexmark_installer = "C:\Lexmark_Universal_v4_UX1_Installation_Package_05022023.exe"
+          $installLog = "$env:RUNNER_TEMP\pos-install.log"
+          Write-Output "::notice::Running Epson installer"
+          Start-Process -FilePath $epson_installer -ArgumentList "/quiet" -Wait
+          Write-Output "::notice::Running Zebra installer"
+          Start-Process -FilePath $zebra_installer -ArgumentList "/S" -Wait
+
       - name: Install XStore
         if: steps.check-installation.outputs.installed == 'false'
         shell: powershell
