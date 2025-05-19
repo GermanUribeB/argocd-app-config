@@ -35,7 +35,6 @@ jobs:
           Write-Output "Downloaded installer to $installerPath"
 
       - name: Install Drivers
-        if: steps.check-installation.outputs.installed == 'false'
         shell: powershell
         run: |
           $zebra_installer = "C:\Zebra_CoreScanner_Driver_64bit_v3.06.0022"
