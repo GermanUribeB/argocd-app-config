@@ -26,21 +26,21 @@ jobs:
           Write-Output "appdata_exists=false" >> $env:GITHUB_OUTPUT
         }
 
-    #- name: Launch XStore to create AppData directory
-      #if: steps.check-appdata.outputs.appdata_exists == 'false'
-      #shell: powershell
-      #run: |
-      #  $xstorePath = "C:\Program Files (x86)\Sherwin-Williams-POS\Sherwin-Williams-POS.exe"
-      #  Write-Output "Launching XStore to create AppData directory..."
+    - name: Launch XStore to create AppData directory
+      if: steps.check-appdata.outputs.appdata_exists == 'false'
+      shell: powershell
+      run: |
+        $xstorePath = "C:\Program Files (x86)\Sherwin-Williams-POS\Sherwin-Williams-POS.exe"
+        Write-Output "Launching XStore to create AppData directory..."
         
         # Start process and wait briefly
-      #  $process = Start-Process -FilePath $xstorePath -PassThru
-      #  Start-Sleep -Seconds 10
-      #  Stop-Process -Id $process.Id -Force
+        $process = Start-Process -FilePath $xstorePath -PassThru
+        Start-Sleep -Seconds 10
+        Stop-Process -Id $process.Id -Force
         
         # Verify directory was created
-      #  $appDataPath = "$env:APPDATA\Roaming\Sherwin-Williams-POS"
-      #  if (-not (Test-Path $appDataPath)) {
-      #    Write-Output "::error::Failed to create AppData directory"
-      #    exit 1
-      #  }
+        $appDataPath = "$env:APPDATA\Roaming\Sherwin-Williams-POS"
+        if (-not (Test-Path $appDataPath)) {
+          Write-Output "::error::Failed to create AppData directory"
+          exit 1
+        }
