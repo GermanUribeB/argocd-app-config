@@ -15,14 +15,14 @@ jobs:
         Write-Output "Checking for directory: $appDataPath"
         
         if (Test-Path $appDataPath) {
-          Write-Output "Directory exists at $appDataPath"
+          Write-Output "::info::Directory exists at $appDataPath"
           Write-Output "appdata_exists=true" >> $env:GITHUB_OUTPUT
           
           # List directory contents for debugging
-          Write-Output "Directory contents:"
+          Write-Output "::info::Directory contents:"
           Get-ChildItem $appDataPath | Format-Table -AutoSize | Out-String -Width 200 | Write-Output
         } else {
-          Write-Output "Directory does not exist"
+          Write-Output "::info::Directory does not exist"
           Write-Output "appdata_exists=false" >> $env:GITHUB_OUTPUT
         }
 
