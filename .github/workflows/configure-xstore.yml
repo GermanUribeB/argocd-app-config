@@ -35,12 +35,66 @@ jobs:
         
         # Start process and wait briefly
         $process = Start-Process -FilePath $xstorePath -PassThru
-        Start-Sleep -Seconds 10
-        Stop-Process -Id $process.Id -Force
+        Start-Sleep -Seconds 15
+        try {
+          Stop-Process -Id $process.Id -Force -ErrorAction Stop
+          Write-Output "XStore process stopped successfully"
+        } catch {
+          Write-Output "Warning: Could not stop XStore process"
+        }
         
         # Verify directory was created
-        $appDataPath = "$env:APPDATA\Roaming\Sherwin-Williams-POS"
-        if (-not (Test-Path $appDataPath)) {
+        $appDataPath = "$env:APPDATA\Sherwin-Williams-POS"
+        if (Test-Path $appDataPath) {
+          Write-Output "AppData directory successfully created at $appDataPath"
+          Write-Output "Contents of new directory:"
+          Get-ChildItem $appDataPath | Format-Table -AutoSize | Out-String -Width 200 | Write-Output
+        } else {
           Write-Output "::error::Failed to create AppData directory"
           exit 1
+        }
+
+    - name: Check for properties file
+      id: check-properties
+      shell: powershell
+      run: |
+        $appDataPath = "$env:APPDATA\Sherwin-Williams-POS"
+        $propertiesFile = "$appDataPath\xstore.properties"
+        $sourceFile = "C:\Program Files (x86)\Sherwin-Williams-POS\xstore.properties"
+        
+        Write-Output "Checking for properties file at $propertiesFile"
+        
+        if (Test-Path $propertiesFile) {
+          Write-Output "Properties file exists"
+          Write-Output "Current content:"
+          Get-Content $propertiesFile | Write-Output
+          Write-Output "properties_exist=true" >> $env:GITHUB_OUTPUT
+        } else {
+          Write-Output "Properties file does not exist"
+          if (Test-Path $sourceFile) {
+            Write-Output "Source properties file found at $sourceFile"
+            Write-Output "properties_exist=false" >> $env:GITHUB_OUTPUT
+          } else {
+            Write-Output "::error::Source properties file not found at $sourceFile"
+            exit 1
+          }
+        }
+
+    - name: Move properties file if needed
+      if: steps.check-properties.outputs.properties_exist == 'false'
+      shell: powershell
+      run: |
+        $appDataPath = "$env:APPDATA\Sherwin-Williams-POS"
+        $propertiesFile = "$appDataPath\xstore.properties"
+        $sourceFile = "C:\Program Files (x86)\Sherwin-Williams-POS\xstore.properties"
+        
+        Copy-Item -Path $sourceFile -Destination $appDataPath -Force
+        if (-not (Test-Path $propertiesFile)) {
+          Write-Output "::error::Failed to copy properties file"
+          exit 1
+        }
+
+        if (Test-Path $sourceFile) {
+          Remove-Item -Path $sourceFile -Force
+          Write-Output "Removed source properties file from Program Files directory"
         }
