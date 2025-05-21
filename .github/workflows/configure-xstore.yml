@@ -102,3 +102,39 @@ jobs:
           Remove-Item -Path $sourceFile -Force
           Write-Output "::notice::Removed PropertiesFile from $sourceFile"
         }
+
+    - name: Update properties file values
+      shell: powershell
+      run: |
+        $propertiesFile = "$env:APPDATA\Sherwin-Williams-POS\xstore.properties"
+        
+        if (-not (Test-Path $propertiesFile)) {
+          Write-Output "::error::Properties file not found at $propertiesFile"
+          exit 1
+        }
+        
+        # Backup original file
+        $backupFile = "$propertiesFile.bak"
+        Copy-Item -Path $propertiesFile -Destination $backupFile -Force
+        
+        # Read and update file content
+        $content = Get-Content $propertiesFile
+        $updatedContent = $content -replace 'dtv\.location\.storeNumber=.*', 'dtv.location.storeNumber=723954' `
+                                   -replace 'dtv\.location\.terminalNumber=.*', 'dtv.location.terminalNumber=11'
+        
+        # Write updated content
+        Set-Content -Path $propertiesFile -Value $updatedContent -Force
+        
+        # Verify changes
+        $storeNumber = Select-String -Path $propertiesFile -Pattern 'dtv\.location\.storeNumber=723954'
+        $terminalNumber = Select-String -Path $propertiesFile -Pattern 'dtv\.location\.terminalNumber=11'
+        
+        if (-not $storeNumber -or -not $terminalNumber) {
+          Write-Output "::error::Failed to update properties file"
+          # Restore backup
+          Move-Item -Path $backupFile -Destination $propertiesFile -Force -ErrorAction SilentlyContinue
+          exit 1
+        } else {
+          Remove-Item -Path $backupFile -Force -ErrorAction SilentlyContinue
+          Write-Output "::notice::Successfully updated properties file"
+        }
