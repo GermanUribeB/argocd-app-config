@@ -15,14 +15,14 @@ jobs:
         Write-Output "Checking for directory: $appDataPath"
         
         if (Test-Path $appDataPath) {
-          Write-Output "::info::Directory exists at $appDataPath"
+          Write-Output "::notice::Directory exists at $appDataPath"
           Write-Output "appdata_exists=true" >> $env:GITHUB_OUTPUT
           
           # List directory contents for debugging
-          Write-Output "::info::Directory contents:"
+          Write-Output "::notice::Directory contents:"
           Get-ChildItem $appDataPath | Format-Table -AutoSize | Out-String -Width 200 | Write-Output
         } else {
-          Write-Output "::info::Directory does not exist"
+          Write-Output "::notice::Directory does not exist"
           Write-Output "appdata_exists=false" >> $env:GITHUB_OUTPUT
         }
 
@@ -31,23 +31,23 @@ jobs:
       shell: powershell
       run: |
         $xstorePath = "C:\Program Files (x86)\Sherwin-Williams-POS\Sherwin-Williams-POS.exe"
-        Write-Output "Launching XStore to create AppData directory..."
+        Write-Output "::notice::Launching XStore to create AppData directory..."
         
         # Start process and wait briefly
         $process = Start-Process -FilePath $xstorePath -PassThru
         Start-Sleep -Seconds 15
         try {
           Stop-Process -Id $process.Id -Force -ErrorAction Stop
-          Write-Output "XStore process stopped successfully"
+          Write-Output "::notice::XStore process stopped successfully"
         } catch {
-          Write-Output "Warning: Could not stop XStore process"
+          Write-Output "::warning:: Could not stop XStore process"
         }
         
         # Verify directory was created
         $appDataPath = "$env:APPDATA\Sherwin-Williams-POS"
         if (Test-Path $appDataPath) {
-          Write-Output "AppData directory successfully created at $appDataPath"
-          Write-Output "Contents of new directory:"
+          Write-Output "::notice::AppData directory successfully created at $appDataPath"
+          Write-Output "::notice::Contents of new directory:"
           Get-ChildItem $appDataPath | Format-Table -AutoSize | Out-String -Width 200 | Write-Output
         } else {
           Write-Output "::error::Failed to create AppData directory"
@@ -62,17 +62,17 @@ jobs:
         $propertiesFile = "$appDataPath\xstore.properties"
         $sourceFile = "C:\Program Files (x86)\Sherwin-Williams-POS\xstore.properties"
         
-        Write-Output "Checking for properties file at $propertiesFile"
+        Write-Output "::notice::Checking for properties file at $propertiesFile"
         
         if (Test-Path $propertiesFile) {
-          Write-Output "Properties file exists"
-          Write-Output "Current content:"
+          Write-Output "::notice::Properties file exists"
+          Write-Output "::notice::Current content:"
           Get-Content $propertiesFile | Write-Output
           Write-Output "properties_exist=true" >> $env:GITHUB_OUTPUT
         } else {
-          Write-Output "Properties file does not exist"
+          Write-Output "::notice::Properties file does not exist"
           if (Test-Path $sourceFile) {
-            Write-Output "Source properties file found at $sourceFile"
+            Write-Output "::notice::Source properties file found at $sourceFile"
             Write-Output "properties_exist=false" >> $env:GITHUB_OUTPUT
           } else {
             Write-Output "::error::Source properties file not found at $sourceFile"
@@ -93,12 +93,12 @@ jobs:
           Write-Output "::error::Failed to copy properties file"
           exit 1
         } else {
-          Write-Output "PropertiesFile moved to $appDataPath"
-          Write-Output "Directory contents:"
+          Write-Output "::notice::PropertiesFile moved to $appDataPath"
+          Write-Output "::notice::Directory contents:"
           Get-ChildItem $appDataPath | Format-Table -AutoSize | Out-String -Width 200 | Write-Output
         }
 
         if (Test-Path $sourceFile) {
           Remove-Item -Path $sourceFile -Force
-          Write-Output "Removed PropertiesFile from $sourceFile"
+          Write-Output "::notice::Removed PropertiesFile from $sourceFile"
         }
