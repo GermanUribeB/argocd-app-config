@@ -11,12 +11,19 @@ jobs:
       id: check-appdata
       shell: powershell
       run: |
-        $appDataPath = "$env:APPDATA\Roaming\Sherwin-Williams-POS"
+        $appDataPath = "$env:APPDATA\Sherwin-Williams-POS"
+        Write-Output "Checking for directory: $appDataPath"
+        
         if (Test-Path $appDataPath) {
-          Write-Output "::notice::AppData directory exists at $appDataPath"
-          Write-Output "::set-output name=appdata_exists::true"
+          Write-Output "Directory exists at $appDataPath"
+          Write-Output "appdata_exists=true" >> $env:GITHUB_OUTPUT
+          
+          # List directory contents for debugging
+          Write-Output "Directory contents:"
+          Get-ChildItem $appDataPath | Format-Table -AutoSize | Out-String -Width 200 | Write-Output
         } else {
-          Write-Output "::set-output name=appdata_exists::false"
+          Write-Output "Directory does not exist"
+          Write-Output "appdata_exists=false" >> $env:GITHUB_OUTPUT
         }
 
     #- name: Launch XStore to create AppData directory
